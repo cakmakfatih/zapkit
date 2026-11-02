@@ -8,6 +8,7 @@ export {
   registerKeyCodes,
   registerKeyNames,
   registerPlatformKeys,
+  exitApp,
   MEDIA_KEYS,
 } from './keys';
 export type { LogicalKey } from './keys';

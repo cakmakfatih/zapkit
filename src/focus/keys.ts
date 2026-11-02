@@ -135,3 +135,31 @@ export function registerPlatformKeys(keys: string[] = [
     }
   }
 }
+
+/**
+ * Leaves the app on the platform it runs on, using the first mechanism that exists:
+ * webOS `PalmSystem.platformBack()` (exit popup on webOS 6+, Home launcher before),
+ * Hisense/VIDAA, Tizen, older Samsung `webapis`, Cordova-style wrappers, then `window.close()`.
+ * The router calls this when Back is pressed on the first screen (see `RouterOptions.onExit`).
+ *
+ * On webOS the platform only sends the Back key to the page when the app's `appinfo.json` has
+ * `"disableBackHistoryAPI": true`; without it webOS handles Back itself and never reaches this code.
+ */
+export function exitApp(): void {
+  const w = globalThis as any;
+  const attempts: Array<() => boolean> = [
+    () => typeof w.PalmSystem?.platformBack === 'function' && (w.PalmSystem.platformBack(), true),
+    () => typeof w.Hisense_ExitApp === 'function' && (w.Hisense_ExitApp(), true),
+    () => typeof w.tizen?.application?.getCurrentApplication === 'function' && (w.tizen.application.getCurrentApplication().exit(), true),
+    () => typeof w.webapis?.application?.exit === 'function' && (w.webapis.application.exit(), true),
+    () => typeof w.navigator?.app?.exitApp === 'function' && (w.navigator.app.exitApp(), true),
+    () => typeof w.close === 'function' && (w.close(), true),
+  ];
+  for (const attempt of attempts) {
+    try {
+      if (attempt()) return;
+    } catch {
+      // try the next platform
+    }
+  }
+}

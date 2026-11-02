@@ -3,6 +3,7 @@ import { createContext, type Context } from '../core/context';
 import { useContext, useSubscription } from '../core/hooks';
 import { h, type Child, type ComponentType, type VNode } from '../core/vnode';
 import { focus as defaultFocus, type FocusManager } from '../focus/focus-manager';
+import { exitApp } from '../focus/keys';
 
 /*
  * Stack router for TV apps.
@@ -45,7 +46,10 @@ export interface RouterOptions {
   routes: RouteDef[];
   initial?: string;
   focus?: FocusManager;
-  /** Called when Back is pressed on the first screen. Return true if handled. */
+  /**
+   * Called when Back is pressed on the first screen. Return true if handled.
+   * Default: leave the app with `exitApp()`.
+   */
   onExit?: () => boolean | void;
   /** Mirror the top entry into location.hash and start from it. */
   syncHash?: boolean;
@@ -199,7 +203,9 @@ export class Router {
     if (!this.releaseBack) {
       this.releaseBack = this.focusManager.onBack(() => {
         if (this.back()) return true;
-        return this.options.onExit ? this.options.onExit() : false;
+        if (this.options.onExit) return this.options.onExit();
+        exitApp();
+        return true;
       });
     }
     return () => this.detach();

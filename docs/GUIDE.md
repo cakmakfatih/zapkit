@@ -330,6 +330,20 @@ VIDAA/Hisense back **8 / 27**, media keys **415/19/413/417/412**, colour keys
 `registerKeyNames({ XF86Foo: 'menu' })`. On Tizen, `registerPlatformKeys()` must be
 called for the media keys.
 
+### Back and leaving the app
+
+The router handles Back: it goes to the previous screen and, on the first screen, calls
+`exitApp()` (override with the router's `onExit`). `exitApp()` uses the first mechanism the
+platform offers: webOS `PalmSystem.platformBack()` (exit popup on webOS 6+, Home launcher
+before), Hisense/VIDAA, Tizen, older Samsung `webapis`, Cordova-style wrappers, then
+`window.close()`.
+
+**webOS needs one packaging setting.** By default webOS handles the remote's Back key itself
+(browser history, then an exit popup) and the page never sees it, so every screen would
+close the app. Set `"disableBackHistoryAPI": true` in the app's `appinfo.json`; the key
+(keyCode 461) then reaches the page and the router handles it. This applies to hosted apps
+too: set it in the small wrapper package that opens your URL.
+
 ---
 
 ## 6. State management (store)
@@ -373,7 +387,8 @@ const router = createRouter({
     { path: '/', component: Home, keepAlive: true },   // stays alive in the background
     { path: '/series/:id', component: SeriesDetail },
   ],
-  onExit: () => { /* back on the first screen: leave the app */ },
+  // optional: Back on the first screen calls exitApp() unless you handle it here
+  onExit: () => false,
   syncHash: false,
 });
 
