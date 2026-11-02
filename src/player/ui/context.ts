@@ -15,6 +15,8 @@ export function usePlayer(): Player {
 export interface PlayerStrings {
   play: string;
   pause: string;
+  previous: string;
+  next: string;
   rewind: string;
   forward: string;
   captions: string;
@@ -31,6 +33,30 @@ export interface PlayerStrings {
   textColor: string;
   background: string;
   live: string;
+  edge: string;
+  edgeNone: string;
+  edgeOutline: string;
+  edgeDropShadow: string;
+  edgeRaised: string;
+  edgeDepressed: string;
+  white: string;
+  yellow: string;
+  cyan: string;
+  green: string;
+  statsEngine: string;
+  statsVideoId: string;
+  statsFrames: string;
+  /** The value of the frames row; {viewport}, {dropped} and {total} are replaced. */
+  statsFramesValue: string;
+  statsResolution: string;
+  statsVolume: string;
+  statsCodecs: string;
+  statsConnection: string;
+  statsBitrate: string;
+  statsBuffer: string;
+  statsLatency: string;
+  statsSpeed: string;
+  statsState: string;
   retry: string;
   errorTitle: string;
   back: string;
@@ -39,6 +65,8 @@ export interface PlayerStrings {
 export const DEFAULT_STRINGS: PlayerStrings = {
   play: 'Play',
   pause: 'Pause',
+  previous: 'Previous',
+  next: 'Next',
   rewind: 'Back 10 seconds',
   forward: 'Forward 10 seconds',
   captions: 'Subtitles',
@@ -55,6 +83,29 @@ export const DEFAULT_STRINGS: PlayerStrings = {
   textColor: 'Text colour',
   background: 'Background',
   live: 'LIVE',
+  edge: 'Edge',
+  edgeNone: 'None',
+  edgeOutline: 'Outline',
+  edgeDropShadow: 'Shadow',
+  edgeRaised: 'Raised',
+  edgeDepressed: 'Depressed',
+  white: 'White',
+  yellow: 'Yellow',
+  cyan: 'Cyan',
+  green: 'Green',
+  statsEngine: 'Engine',
+  statsVideoId: 'Video ID',
+  statsFrames: 'Viewport / Frames',
+  statsFramesValue: '{viewport} / {dropped} dropped of {total}',
+  statsResolution: 'Current / Optimal Res',
+  statsVolume: 'Volume',
+  statsCodecs: 'Codecs',
+  statsConnection: 'Connection Speed',
+  statsBitrate: 'Bitrate',
+  statsBuffer: 'Buffer Health',
+  statsLatency: 'Live Latency',
+  statsSpeed: 'Speed',
+  statsState: 'State',
   retry: 'Retry',
   errorTitle: 'This video cannot be played',
   back: 'Back',

@@ -5,7 +5,7 @@ import type { LogicalKey } from '../../focus/keys';
 import type { Player } from '../player';
 import { PlayerState } from '../types';
 import { DEFAULT_STRINGS, PlayerContext, StringsContext, type PlayerStrings } from './context';
-import { BufferingIndicator, CaptionsLayer, MetadataSection, PlayerSurface, ProgressBar, TimeCounter, ToggleIndicator, TransportControls } from './controls';
+import { BufferingIndicator, CaptionsLayer, MetadataSection, PlayerSurface, ProgressBar, TimeCounter, ToggleIndicator, TransportControls, type TransportButtons } from './controls';
 import { ErrorPanel, SettingsPanel, StatsOverlay, type SettingsSection } from './panels';
 
 /**
@@ -94,8 +94,10 @@ export interface VideoPlayerProps {
   onRetry?: () => void;
   /** Auto-hide delay for the controls while playing (ms). Default 4000. */
   osdTimeout?: number;
-  /** Show the stats-for-nerds button. Default true. */
+  /** Show the stats-for-nerds button. Default true (same as controls.stats). */
   showStats?: boolean;
+  /** Show or remove built-in transport buttons (seek, captions, audio, stats, settings). All default to true. */
+  controls?: TransportButtons;
   /** Extra buttons in the right group of the control bar. */
   extraControls?: Child;
   /** Extra buttons before the rewind button (e.g. "previous"). */
@@ -277,7 +279,7 @@ export function VideoPlayer(props: VideoPlayerProps): VNode {
               <ProgressBar onActivity={bump} />
               <TimeCounter />
             </div>
-            <TransportControls onOpenSettings={(sec) => openSettings(sec || 'root')} onToggleStats={props.showStats === false ? undefined : () => setStats((v) => !v)} extra={props.extraControls} start={props.transportStart} end={props.transportEnd} onActivity={bump} />
+            <TransportControls buttons={props.controls} onOpenSettings={(sec) => openSettings(sec || 'root')} onToggleStats={props.showStats === false ? undefined : () => setStats((v) => !v)} extra={props.extraControls} start={props.transportStart} end={props.transportEnd} onActivity={bump} />
           </div>
         </div>
         {stats ? <StatsOverlay /> : null}

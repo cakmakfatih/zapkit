@@ -48,11 +48,18 @@ function Menu(props: { title: Child; rows: Row[]; onBack?: () => void }): VNode 
 }
 
 const FONT_SCALES = [0.75, 1, 1.25, 1.5, 2];
-const COLORS: Array<[string, string]> = [
-  ['#ffffff', 'White'],
-  ['#ffff00', 'Yellow'],
-  ['#00ffff', 'Cyan'],
-  ['#00ff00', 'Green'],
+const COLORS: Array<[string, 'white' | 'yellow' | 'cyan' | 'green']> = [
+  ['#ffffff', 'white'],
+  ['#ffff00', 'yellow'],
+  ['#00ffff', 'cyan'],
+  ['#00ff00', 'green'],
+];
+const EDGES: Array<[CaptionSettings['edge'], 'edgeNone' | 'edgeOutline' | 'edgeDropShadow' | 'edgeRaised' | 'edgeDepressed']> = [
+  ['none', 'edgeNone'],
+  ['outline', 'edgeOutline'],
+  ['drop-shadow', 'edgeDropShadow'],
+  ['raised', 'edgeRaised'],
+  ['depressed', 'edgeDepressed'],
 ];
 const BACKGROUNDS: Array<[number, string]> = [
   [0, '0%'],
@@ -148,7 +155,10 @@ export function SettingsPanel(props: { section: SettingsSection; onSection: (s: 
             {
               key: 'cs-color',
               label: strings.textColor,
-              value: (COLORS.find((c) => c[0] === cs.color) || [cs.color, cs.color])[1],
+              value: (() => {
+                const c = COLORS.find((x) => x[0] === cs.color);
+                return c ? strings[c[1]] : cs.color;
+              })(),
               onSelect: set({ color: cycle(COLORS.map((c) => c[0]), cs.color) }),
             },
             {
@@ -159,9 +169,9 @@ export function SettingsPanel(props: { section: SettingsSection; onSection: (s: 
             },
             {
               key: 'cs-edge',
-              label: 'Edge',
-              value: cs.edge,
-              onSelect: set({ edge: cycle<CaptionSettings['edge']>(['none', 'outline', 'drop-shadow', 'raised', 'depressed'], cs.edge) }),
+              label: strings.edge,
+              value: strings[(EDGES.find((e) => e[0] === cs.edge) || EDGES[0])[1]],
+              onSelect: set({ edge: cycle<CaptionSettings['edge']>(EDGES.map((e) => e[0]), cs.edge) }),
             },
           ]}
         />
@@ -197,19 +207,24 @@ export function StatsOverlay(props: { interval?: number }): VNode {
     const t = setInterval(() => setStats(player.getStatsForNerds()), props.interval || 1000);
     return () => clearInterval(t);
   }, [player]);
+  const strings = useStrings();
+  const frames = strings.statsFramesValue
+    .replace('{viewport}', stats.viewport)
+    .replace('{dropped}', String(stats.droppedFrames))
+    .replace('{total}', String(stats.totalFrames));
   const rows: Array<[string, string]> = [
-    ['Engine', stats.engine],
-    ['Video ID', stats.videoId],
-    ['Viewport / Frames', `${stats.viewport} / ${stats.droppedFrames} dropped of ${stats.totalFrames}`],
-    ['Current / Optimal Res', `${stats.resolution} / ${stats.quality}`],
-    ['Volume', stats.volume],
-    ['Codecs', stats.codecs],
-    ['Connection Speed', stats.bandwidthKbps + ' Kbps'],
-    ['Bitrate', stats.bitrateKbps + ' Kbps'],
-    ['Buffer Health', stats.bufferHealth.toFixed(2) + ' s'],
-    ['Live Latency', stats.liveLatency == null ? '-' : stats.liveLatency.toFixed(2) + ' s'],
-    ['Speed', stats.playbackRate + 'x'],
-    ['State', stats.state],
+    [strings.statsEngine, stats.engine],
+    [strings.statsVideoId, stats.videoId],
+    [strings.statsFrames, frames],
+    [strings.statsResolution, `${stats.resolution} / ${stats.quality}`],
+    [strings.statsVolume, stats.volume],
+    [strings.statsCodecs, stats.codecs],
+    [strings.statsConnection, stats.bandwidthKbps + ' Kbps'],
+    [strings.statsBitrate, stats.bitrateKbps + ' Kbps'],
+    [strings.statsBuffer, stats.bufferHealth.toFixed(2) + ' s'],
+    [strings.statsLatency, stats.liveLatency == null ? '-' : stats.liveLatency.toFixed(2) + ' s'],
+    [strings.statsSpeed, stats.playbackRate + 'x'],
+    [strings.statsState, stats.state],
   ];
   return (
     <div className="kb-stats" aria-hidden="true">

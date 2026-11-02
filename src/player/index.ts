@@ -43,7 +43,7 @@ export {
   ToggleIndicator,
   BufferingIndicator,
 } from './ui/controls';
-export type { ProgressBarProps, TransportControlsProps } from './ui/controls';
+export type { ProgressBarProps, TransportButtons, TransportControlsProps } from './ui/controls';
 export { SettingsPanel, StatsOverlay, ErrorPanel } from './ui/panels';
 export type { SettingsSection } from './ui/panels';
 export { VideoPlayer, usePlayerKeys } from './ui/video-player';

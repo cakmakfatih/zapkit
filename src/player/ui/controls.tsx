@@ -214,7 +214,27 @@ export function ProgressBar(props: ProgressBarProps): VNode {
 }
 ProgressBar.displayName = 'ProgressBar';
 
+/** Which built-in transport buttons are shown. Every flag defaults to true; set one to false to remove that button. */
+export interface TransportButtons {
+  /** Previous item of a playlist (shown only when the playlist has several items). */
+  previous?: boolean;
+  /** Next item of a playlist (shown only when the playlist has several items). */
+  next?: boolean;
+  /** The -10 s / +10 s buttons. */
+  seek?: boolean;
+  /** Subtitles button (shown only when the video has subtitle tracks). */
+  captions?: boolean;
+  /** Audio-track button (shown only when there are several tracks). */
+  audio?: boolean;
+  /** Stats-for-nerds button. */
+  stats?: boolean;
+  /** Settings button. */
+  settings?: boolean;
+}
+
 export interface TransportControlsProps {
+  /** Built-in buttons to show or remove. */
+  buttons?: TransportButtons;
   onOpenSettings?: (section?: 'root' | 'captions' | 'audio') => void;
   onToggleStats?: () => void;
   /** Extra buttons appended to the right group. */
@@ -226,17 +246,20 @@ export interface TransportControlsProps {
   onActivity?: () => void;
 }
 
-/** -10 / play-pause / +10, plus captions, audio and settings; apps add their own buttons through `start`, `end` and `extra`. */
+/** Previous / -10 / play-pause / +10 / next, plus captions, audio and settings; apps add their own buttons through `start`, `end` and `extra`. */
 export function TransportControls(props: TransportControlsProps): VNode {
   const player = usePlayer();
   const strings = useStrings();
   const state = useSignalValue(player.state);
   const live = useSignalValue(player.liveMode);
+  const list = useSignalValue(player.playlist);
+  useSignalValue(player.playlistIndex);
   const captions = useSignalValue(player.captionTracks);
   const caption = useSignalValue(player.captionTrack);
   const audio = useSignalValue(player.audioTracks);
   const playing = state === PlayerState.PLAYING || state === PlayerState.BUFFERING;
-  const canSeek = live !== 'live';
+  const b = props.buttons || {};
+  const canSeek = live !== 'live' && b.seek !== false;
   const act = (fn: () => void) => () => {
     fn();
     if (props.onActivity) props.onActivity();
@@ -245,6 +268,9 @@ export function TransportControls(props: TransportControlsProps): VNode {
     <div className="kb-transport" focusGroup={{ orientation: 'horizontal' }}>
       <div className="kb-transport__group">
         {props.start}
+        {list.length > 1 && b.previous !== false ? (
+          <Button icon="previous" ariaLabel={strings.previous} disabled={!player.hasPrevious() && live !== 'none'} onClick={act(() => player.previousVideo())} />
+        ) : null}
         {canSeek ? <Button icon="replay10" ariaLabel={strings.rewind} onClick={act(() => player.seekBy(-10))} /> : null}
         <Button
           icon={playing ? 'pause' : 'play'}
@@ -254,16 +280,19 @@ export function TransportControls(props: TransportControlsProps): VNode {
           onClick={act(() => player.togglePlay())}
         />
         {canSeek ? <Button icon="forward10" ariaLabel={strings.forward} onClick={act(() => player.seekBy(10))} /> : null}
+        {list.length > 1 && b.next !== false ? <Button icon="next" ariaLabel={strings.next} disabled={!player.hasNext()} onClick={act(() => player.nextVideo())} /> : null}
         {props.end}
       </div>
       <div className="kb-transport__group kb-transport__group--end">
         {props.extra}
-        {captions.length ? (
+        {captions.length && b.captions !== false ? (
           <Button icon="captions" ariaLabel={strings.captions} selected={!!caption} onClick={act(() => props.onOpenSettings && props.onOpenSettings('captions'))} />
         ) : null}
-        {audio.length > 1 ? <Button icon="audio" ariaLabel={strings.audio} onClick={act(() => props.onOpenSettings && props.onOpenSettings('audio'))} /> : null}
-        {props.onToggleStats ? <Button icon="stats" ariaLabel={strings.stats} onClick={act(() => props.onToggleStats!())} /> : null}
-        <Button icon="settings" ariaLabel={strings.settings} focusId="kb-player-settings" onClick={act(() => props.onOpenSettings && props.onOpenSettings('root'))} />
+        {audio.length > 1 && b.audio !== false ? <Button icon="audio" ariaLabel={strings.audio} onClick={act(() => props.onOpenSettings && props.onOpenSettings('audio'))} /> : null}
+        {props.onToggleStats && b.stats !== false ? <Button icon="stats" ariaLabel={strings.stats} onClick={act(() => props.onToggleStats!())} /> : null}
+        {b.settings !== false ? (
+          <Button icon="settings" ariaLabel={strings.settings} focusId="kb-player-settings" onClick={act(() => props.onOpenSettings && props.onOpenSettings('root'))} />
+        ) : null}
       </div>
     </div>
   );
