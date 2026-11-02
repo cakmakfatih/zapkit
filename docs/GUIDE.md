@@ -1,5 +1,10 @@
 # zapkit-tv Guide
 
+> **Early stage.** zapkit-tv is new and not ready for production use. Its tests are not detailed yet: they
+> cover the renderer, the focus rules, the on-screen keyboard and the player UI with jsdom, but not
+> real TVs or real streams. APIs can change without notice. If you want to build on it, **fork the
+> repository** and treat your work as experimental. Bug reports are welcome.
+
 > A React-like, standalone web UI library for TV devices. It covers D-pad
 > navigation, state management, a router, TV UI building blocks and **a complete
 > video player** (HLS / DASH / progressive, ABR, DRM, subtitles, playlists).
@@ -7,33 +12,93 @@
 Contents
 
 1. [What it is and how it was made](#1-what-it-is-and-how-it-was-made)
-3. [Architecture](#3-architecture)
-4. [Installation and first app](#4-installation-and-first-app)
-5. [Core: components, hooks, signals](#5-core-components-hooks-signals)
-6. [Focus and remote keys](#6-focus-and-remote-keys)
-7. [State management (store)](#7-state-management-store)
-8. [Router](#8-router)
-9. [UI building blocks](#9-ui-building-blocks)
-10. [Player](#10-player)
-11. [Theme and CSS](#11-theme-and-css)
-12. [Development commands](#12-development-commands)
-14. [Limits and known gaps](#14-limits-and-known-gaps)
+2. [Architecture](#2-architecture)
+3. [Installation and first app](#3-installation-and-first-app)
+4. [Core: components, hooks, signals](#4-core-components-hooks-signals)
+5. [Focus and remote keys](#5-focus-and-remote-keys)
+6. [State management (store)](#6-state-management-store)
+7. [Router](#7-router)
+8. [UI building blocks](#8-ui-building-blocks)
+9. [Player](#9-player)
+10. [Theme and CSS](#10-theme-and-css)
+11. [Development commands](#11-development-commands)
+12. [Limits and known gaps](#12-limits-and-known-gaps)
 
 ---
 
 ## 1. What it is and how it was made
 
 zapkit-tv is a small, standalone UI library for TV web apps (Tizen, webOS, VIDAA, Android TV and
-desktop browsers) with a complete video player. It was inspired by the approach of YouTube's TV
-app: render with Google's open-source incremental-dom, put a thin component layer on top, and
-make remote-control (D-pad) navigation and a rich player first-class. Everything here is original
-code written for this library; no YouTube code was copied, and there is no stream-signature
-handling, ad handling or DRM circumvention. The player is built purely on standard web APIs
-(HTMLMediaElement, Media Source Extensions, EME).
+desktop browsers) with a complete video player.
+
+### 1.1 How it was made
+
+TV apps are different from phone and desktop apps: the user holds a remote with arrow keys, the
+browser is old and the CPU is slow. YouTube's TV app deals with this by keeping the rendering layer thin
+(Google's open-source incremental-dom plus a small component layer) and by treating focus
+navigation and the player as the core of the app. zapkit-tv was inspired by that approach and builds it as a
+standalone library:
+
+1. **Rendering:** incremental-dom (version 0.7, Apache-2.0) is used unmodified as the rendering
+   engine. We did not rewrite it.
+2. **Component layer:** a thin layer on top of it written for this project: components, hooks, context,
+   signals, keyed identity, refs, events.
+3. **Focus:** a spatial focus manager and key normalisation for TV remotes.
+4. **Player:** a headless `Player` plus a ready `VideoPlayer` UI.
+
+Everything in the library is original code. No YouTube code was copied, and there is no stream
+signature handling, ad handling or DRM circumvention. The player is built purely on standard web APIs
+(HTMLMediaElement, Media Source Extensions, Encrypted Media Extensions). zapkit-tv is not affiliated with or
+endorsed by YouTube or Google.
+
+A real app built on it, **F-IPTV**, is live at <https://f-iptv.tvkit.workers.dev/>. It is an IPTV player
+(live TV, movies, series, profiles, PIN lock) for TV browsers and is also an installable PWA.
+
+### 1.2 Technologies and what they are for
+
+| Technology | What it does here |
+|---|---|
+| incremental-dom 0.7 | Patches the real DOM in place during rendering. No virtual-DOM tree is built or diffed, so a render allocates little memory. It is the only runtime dependency. |
+| TypeScript and JSX (`h`) | A typed API and a React-like way to write views: function components with hooks, class components for lifecycles, context, keyed lists. |
+| Signals | A value can be put directly in a view (`<span>{player.currentTime}</span>`). Only that text node updates and the component does not render again. The player publishes its state this way. |
+| Focus manager | Spatial navigation for the arrow keys, focus groups (wrap, trap, memory), locks and restoration, plus key mapping for Tizen, webOS, VIDAA and Android TV remotes. |
+| Store and router | A small Redux-compatible store and a stack router that goes back with the previously focused item focused again. |
+| `VirtualList` | Lists and grids with thousands of items: only the window around the focused item is in the DOM, and it scrolls with a CSS transform. |
+| Media Source Extensions, EME | The built-in DASH engine (ABR, live and DVR) and DRM. HLS plays natively or through an hls.js build that the app provides. |
+| rem-based scaling | Layouts are designed on a 1920×1080 canvas and scale to any screen with one root font size. |
+
+### 1.3 Why it performs well on TVs
+
+- **No virtual DOM.** incremental-dom writes only what changed into the real DOM while it walks the view.
+  Memory use and garbage collection stay low on TV chipsets.
+- **Fine-grained updates.** Signals and keyed rendering touch single nodes. Moving the focus or a ticking
+  progress bar does not re-render a screen.
+- **Small windows of DOM.** `VirtualList` keeps a few dozen nodes alive however long the list is.
+- **Compositor-friendly motion.** Scrolling and focus effects use `transform` and `opacity`, which low-end GPUs
+  animate without a relayout.
+- **Old-browser friendly.** The library compiles to ES2017 and has a single dependency. The example app
+  targets Chrome 69-era TV browsers; its whole application script is about 73 kB gzipped, and hls.js loads
+  separately.
+
+### 1.4 The player
+
+- **Headless core plus a ready UI.** `Player` has no UI and publishes its state as signals, so it works with your
+  own screens. `VideoPlayer` is a full on-screen display (play/pause, seek, settings, captions, quality,
+  speed, stats) built on it.
+- **Many formats.** HLS (native or hls.js), DASH and progressive files, with ABR, live and DVR, DRM through EME,
+  WebVTT subtitles with caption styling, audio tracks and storyboard seek previews.
+- **Generic and extensible.** It ships only the controls every player needs. Next episode, channel zapping, "go
+  live" or an "up next" card are added by the app through slots (`transportStart`, `transportEnd`,
+  `extraControls`, `children`) and the player API. A control the app leaves out is not rendered at all.
+- **Everything is replaceable.** All text lives in `PlayerStrings`, icons can be swapped, and the viewer's
+  preferences (volume, quality, caption style) are remembered.
+- **Playlists.** Auto-advance, previous and next, shuffle and loop, and an "up next" countdown for series.
+- **Made for the remote.** Every control is focusable and the keys map to seek, play/pause and the media keys of
+  TV remotes.
 
 ---
 
-## 3. Architecture
+## 2. Architecture
 
 ```
                   ┌──────────────────────────────────────────────┐
@@ -71,11 +136,16 @@ Directory layout:
 
 ---
 
-## 4. Installation and first app
+## 3. Installation and first app
 
-There are two ways in local projects:
+**a) From npm:**
 
-**a) From source (recommended, fastest development):** use `src` directly through a Vite alias.
+```bash
+npm install zapkit-tv
+```
+
+**b) From source (fastest while developing zapkit-tv itself):** clone the repository next to your
+project and use `src` directly through a Vite alias.
 
 ```ts
 // vite.config.ts
@@ -95,8 +165,8 @@ export default defineConfig({
 });
 ```
 
-**b) Built package:** run `npm run build` in `zapkit-tv`, then add
-`"zapkit-tv": "file:../zapkit-tv"` to your project.
+(Because zapkit-tv is at an early stage, forking it and working from source is the safer route
+for anything beyond a trial.)
 
 TypeScript settings (classic JSX):
 
@@ -129,7 +199,7 @@ focus.start(document.body); // start listening to the remote
 
 ---
 
-## 5. Core: components, hooks, signals
+## 4. Core: components, hooks, signals
 
 ### Elements and prop mapping
 
@@ -203,7 +273,7 @@ const theme = useContext(Theme);
 
 ---
 
-## 6. Focus and remote keys
+## 5. Focus and remote keys
 
 `focus` (the default `FocusManager` instance) handles all remote input.
 
@@ -260,7 +330,7 @@ called for the media keys.
 
 ---
 
-## 7. State management (store)
+## 6. State management (store)
 
 The same model as Redux; no extra library is needed.
 
@@ -289,7 +359,7 @@ There is also `createSelector` (memoised), `shallow` (shallow equality), `connec
 
 ---
 
-## 8. Router
+## 7. Router
 
 Stack-based, built for TV apps: going forward pushes a screen onto the stack, the
 back key returns to the previous screen and **focus is restored to the element you
@@ -317,7 +387,7 @@ The `useRouter()` / `useRoute()` hooks are available too.
 
 ---
 
-## 9. UI building blocks
+## 8. UI building blocks
 
 ### Scaling
 
@@ -398,7 +468,7 @@ and pasted text (`paste`) into its value.
 
 ---
 
-## 10. Player
+## 9. Player
 
 The most important module. It has two layers:
 
@@ -705,7 +775,7 @@ ErrorPanel` and `usePlayerKeys(player, opts)`. They work under
 
 ---
 
-## 11. Theme and CSS
+## 10. Theme and CSS
 
 `styles/zapkit-tv.css` gives every component its base style. Theme it with CSS variables:
 
@@ -724,7 +794,7 @@ gets `kb-focus-within`. `prefers-reduced-motion` is respected.
 
 ---
 
-## 12. Development commands
+## 11. Development commands
 
 ```bash
 npm install
@@ -737,7 +807,7 @@ npm run demo:build
 
 ---
 
-## 14. Limits and known gaps
+## 12. Limits and known gaps
 
 - On devices without native HLS the app has to provide hls.js.
 - FairPlay is only defined at the configuration level; it has not been tested on Safari/tvOS.

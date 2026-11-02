@@ -1,8 +1,30 @@
 {
   "name": "zapkit-tv",
   "version": "0.1.0",
-  "private": true,
-  "description": "React-like UI library for TV web apps: keyed incremental rendering, D-pad focus, store, router, virtual lists and a full video player.",
+  "description": "A small React-like UI library for TV web apps: incremental-dom rendering, D-pad focus, store, router, virtual lists and a full video player.",
+  "keywords": [
+    "tv",
+    "smart-tv",
+    "d-pad",
+    "spatial-navigation",
+    "video-player",
+    "hls",
+    "dash",
+    "incremental-dom",
+    "tizen",
+    "webos",
+    "vidaa",
+    "android-tv"
+  ],
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/cakmakfatih/zapkit-tv#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cakmakfatih/zapkit-tv.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cakmakfatih/zapkit-tv/issues"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -32,14 +54,17 @@
   "files": [
     "dist",
     "styles",
-    "docs"
+    "docs",
+    "LICENSE",
+    "README.md"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "node test/run.mjs",
     "demo": "vite examples/demo",
-    "demo:build": "vite build examples/demo"
+    "demo:build": "vite build examples/demo",
+    "prepublishOnly": "npm run typecheck && npm test && npm run build"
   },
   "dependencies": {
     "incremental-dom": "0.7.0"
