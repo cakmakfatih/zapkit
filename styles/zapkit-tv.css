@@ -494,6 +494,15 @@ body {
   width: 5.25rem;
   min-height: 5.25rem;
 }
+/* Start-side controls (skip, play) carry bigger icons than the end-side ones. */
+.kb-transport__group:not(.kb-transport__group--end) .kb-button--icon .kb-icon {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+.kb-transport__group .kb-transport__play.kb-button--icon .kb-icon {
+  width: 3.25rem;
+  height: 3.25rem;
+}
 
 /* ---- toggle indicator (centre flash on play/pause/seek) ---- */
 .kb-toggle-indicator {
