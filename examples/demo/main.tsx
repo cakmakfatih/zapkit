@@ -47,8 +47,9 @@ function Home({ router }: RouteProps) {
         viewportSize={1728}
         focusPrefix="home"
         keyOf={(it) => it.id!}
+        onSelect={(_it, i) => router.navigate('/watch/' + i)}
         renderItem={(it, i) => (
-          <div className="demo-card" onClick={() => router.navigate('/watch/' + i)}>
+          <div className="demo-card">
             <div className="demo-card__art" style={{ background: `linear-gradient(135deg, hsl(${HUES[i % 6]} 70% 45%), hsl(${HUES[(i + 2) % 6]} 60% 25%))` }} />
             <div className="demo-card__label">
               {it.title}

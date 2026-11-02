@@ -1,4 +1,5 @@
 import { onNodesCreated, onNodesDeleted } from '../core/renderer';
+import { preserveClass } from '../core/runtime-classes';
 import { isDirection, normalizeKey, type LogicalKey } from './keys';
 
 /*
@@ -167,6 +168,7 @@ export class FocusManager {
       focusWithinClass: 'kb-focus-within',
       ...options,
     };
+    preserveClass(this.options.focusedClass, this.options.focusWithinClass);
   }
 
   /** Starts listening for keys and DOM changes under `root` (default `document.body`). */

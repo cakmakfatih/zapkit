@@ -29,6 +29,7 @@ export {
 export { signal, computed, effect, batch, isSignal } from './core/signal';
 export type { Signal, ReadonlySignal } from './core/signal';
 export { render, unmount, options, classNames, getInstance, onNodesCreated, onNodesDeleted } from './core/renderer';
+export { preserveClass } from './core/runtime-classes';
 export { flushSync, flushUpdates, setScheduler } from './core/scheduler';
 export { createPortal, Portal } from './core/portal';
 export { defineElement } from './core/element';

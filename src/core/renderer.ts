@@ -17,6 +17,7 @@ import {
 import { isComponentClass, type Component, type Instance } from './component';
 import { releaseContexts, readContext } from './context';
 import { current } from './current';
+import { runtimeClasses } from './runtime-classes';
 import { FunctionHost, assignRef } from './hooks';
 import { setRerenderer, unscheduleUpdate } from './scheduler';
 import { isSignal, type ReadonlySignal } from './signal';
@@ -173,8 +174,21 @@ function applyGeneric(el: Element, name: string, value: unknown) {
   }
 }
 
+function applyClass(el: Element, _name: string, value: unknown) {
+  let next = value == null || value === false ? '' : String(value);
+  if (runtimeClasses.size) {
+    const list = el.classList;
+    runtimeClasses.forEach((c) => {
+      if (list.contains(c) && !(' ' + next + ' ').includes(' ' + c + ' ')) next = next ? next + ' ' + c : c;
+    });
+  }
+  if (next) el.setAttribute('class', next);
+  else el.removeAttribute('class');
+}
+
 attributes[symbols.default] = applyGeneric;
 attributes.style = applyStyle;
+attributes.class = applyClass;
 
 const EVENT_ALIASES: Record<string, string> = { doubleclick: 'dblclick' };
 

@@ -37,6 +37,8 @@ export interface VirtualListProps<T> {
   wrap?: boolean;
   className?: unknown;
   onFocusIndex?: (index: number) => void;
+  /** Enter (or a click) on an item. Item wrappers are the focus targets, so put the action here. */
+  onSelect?: (item: T, index: number) => void;
   /** Called when the window reaches the end (load more). */
   onEndReached?: () => void;
   focusManager?: FocusManager;
@@ -135,6 +137,7 @@ export class VirtualList<T> extends Component<VirtualListProps<T>, VirtualListSt
               'data-index': index,
               focusable: true,
               focusId: p.focusPrefix ? p.focusPrefix + '-' + key : undefined,
+              onClick: p.onSelect ? () => p.onSelect!(item, index) : undefined,
               style: {
                 position: 'absolute',
                 transform: vertical ? `translate(${dp(cross)}, ${dp(main)})` : `translate(${dp(main)}, ${dp(cross)})`,

@@ -9,6 +9,7 @@ import {
   h,
   memo,
   render,
+  preserveClass,
   signal,
   useContext,
   useEffect,
@@ -216,4 +217,17 @@ test('refs and dangerouslySetInnerHTML', () => {
   assert.equal(root.querySelector('b')!.textContent, 'x');
   render(null, root);
   assert.equal(ref.current, null);
+});
+
+test('re-render keeps runtime classes such as kb-focused', () => {
+  const root = container();
+  preserveClass('kb-focused');
+  render(h('div', { className: 'item' }), root);
+  const el = root.firstElementChild!;
+  el.classList.add('kb-focused');
+  render(h('div', { className: ['item', 'item--on'] }), root);
+  assert.equal(el.className, 'item item--on kb-focused');
+  el.classList.remove('kb-focused');
+  render(h('div', { className: 'item' }), root);
+  assert.equal(el.className, 'item');
 });
