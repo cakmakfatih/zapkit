@@ -100,6 +100,8 @@ export interface VideoPlayerProps {
   renderUpNext?: (info: UpNextInfo) => Child;
   /** Extra buttons in the control bar. */
   extraControls?: Child;
+  /** Previous / next buttons beside the transport controls for playlists. Default true; media keys keep working when false. */
+  skipButtons?: boolean;
   /** Extra content under the title. */
   metadata?: Child;
   /** Overlay drawn above the video (e.g. a channel list). */
@@ -282,7 +284,7 @@ export function VideoPlayer(props: VideoPlayerProps): VNode {
               <ProgressBar onActivity={bump} />
               <TimeCounter />
             </div>
-            <TransportControls onOpenSettings={(sec) => openSettings(sec || 'root')} onToggleStats={props.showStats === false ? undefined : () => setStats((v) => !v)} extra={props.extraControls} onActivity={bump} />
+            <TransportControls onOpenSettings={(sec) => openSettings(sec || 'root')} onToggleStats={props.showStats === false ? undefined : () => setStats((v) => !v)} extra={props.extraControls} skipButtons={props.skipButtons} onActivity={bump} />
           </div>
         </div>
         {stats ? <StatsOverlay /> : null}

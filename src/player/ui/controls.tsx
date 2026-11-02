@@ -229,6 +229,8 @@ export interface TransportControlsProps {
   onToggleStats?: () => void;
   /** Extra buttons appended to the right group. */
   extra?: Child;
+  /** Previous / next buttons around the transport for playlists. Default true. */
+  skipButtons?: boolean;
   onActivity?: () => void;
 }
 
@@ -252,7 +254,7 @@ export function TransportControls(props: TransportControlsProps): VNode {
   return (
     <div className="kb-transport" focusGroup={{ orientation: 'horizontal' }}>
       <div className="kb-transport__group">
-        {list.length > 1 ? <Button icon="previous" ariaLabel={strings.previous} disabled={!player.hasPrevious() && live !== 'none'} onClick={act(() => player.previousVideo())} /> : null}
+        {list.length > 1 && props.skipButtons !== false ? <Button icon="previous" ariaLabel={strings.previous} disabled={!player.hasPrevious() && live !== 'none'} onClick={act(() => player.previousVideo())} /> : null}
         {canSeek ? <Button icon="replay10" ariaLabel={strings.rewind} onClick={act(() => player.seekBy(-10))} /> : null}
         <Button
           icon={playing ? 'pause' : 'play'}
@@ -262,7 +264,7 @@ export function TransportControls(props: TransportControlsProps): VNode {
           onClick={act(() => player.togglePlay())}
         />
         {canSeek ? <Button icon="forward10" ariaLabel={strings.forward} onClick={act(() => player.seekBy(10))} /> : null}
-        {list.length > 1 ? <Button icon="next" ariaLabel={strings.next} disabled={!player.hasNext()} onClick={act(() => player.nextVideo())} /> : null}
+        {list.length > 1 && props.skipButtons !== false ? <Button icon="next" ariaLabel={strings.next} disabled={!player.hasNext()} onClick={act(() => player.nextVideo())} /> : null}
       </div>
       <div className="kb-transport__group kb-transport__group--end">
         {props.extra}
