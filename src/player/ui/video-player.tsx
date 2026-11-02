@@ -2,11 +2,11 @@ import { useEffect, useRef, useSignalValue, useState } from '../../core/hooks';
 import { h, type Child, type VNode } from '../../core/vnode';
 import { focus as defaultFocus, type FocusManager } from '../../focus/focus-manager';
 import type { LogicalKey } from '../../focus/keys';
-import type { Player, UpNextInfo } from '../player';
+import type { Player } from '../player';
 import { PlayerState } from '../types';
 import { DEFAULT_STRINGS, PlayerContext, StringsContext, type PlayerStrings } from './context';
 import { BufferingIndicator, CaptionsLayer, MetadataSection, PlayerSurface, ProgressBar, TimeCounter, ToggleIndicator, TransportControls } from './controls';
-import { ErrorPanel, SettingsPanel, StatsOverlay, UpNextCard, type SettingsSection } from './panels';
+import { ErrorPanel, SettingsPanel, StatsOverlay, type SettingsSection } from './panels';
 
 /**
  * Remote media keys (play/pause, stop, FF/RW, next/previous, subtitle and
@@ -96,15 +96,19 @@ export interface VideoPlayerProps {
   osdTimeout?: number;
   /** Show the stats-for-nerds button. Default true. */
   showStats?: boolean;
-  /** Custom content for the "Up next" card. */
-  renderUpNext?: (info: UpNextInfo) => Child;
-  /** Extra buttons in the control bar. */
+  /** Extra buttons in the right group of the control bar. */
   extraControls?: Child;
-  /** Previous / next buttons beside the transport controls for playlists. Default true; media keys keep working when false. */
-  skipButtons?: boolean;
+  /** Extra buttons before the rewind button (e.g. "previous"). */
+  transportStart?: Child;
+  /** Extra buttons after the forward button (e.g. "next"). */
+  transportEnd?: Child;
   /** Extra content under the title. */
   metadata?: Child;
-  /** Overlay drawn above the video (e.g. a channel list). */
+  /**
+   * Overlay drawn above the video (a channel list, an "up next" card…). Give an overlay's root the attribute
+   * `data-kb-overlay`: while focus is inside it the player's own key handling stands aside, so the overlay
+   * uses the D-pad and Enter normally and decides what Back does.
+   */
   children?: Child;
   className?: unknown;
   focusManager?: FocusManager;
@@ -113,7 +117,8 @@ export interface VideoPlayerProps {
 /**
  * Complete TV player: video surface, captions, buffering spinner, on-screen
  * controls that hide while playing, D-pad scrubbing, settings sheet, stats,
- * "Up next" with countdown for playlists/series, and error handling.
+ * and error handling. Playlist, "up next" and live-edge controls are left to
+ * the app (see extraControls, transportStart/End and children).
  *
  * Remote behaviour (OSD hidden): left/right seek 10 s, Enter toggles play,
  * up/down show the controls, Back calls `onBack`. With the OSD visible the
@@ -124,7 +129,6 @@ export function VideoPlayer(props: VideoPlayerProps): VNode {
   const manager = props.focusManager || defaultFocus;
   const strings = props.strings ? { ...DEFAULT_STRINGS, ...props.strings } : DEFAULT_STRINGS;
   const state = useSignalValue(player.state);
-  const upNext = useSignalValue(player.upNext);
   const error = useSignalValue(player.error);
   const live = useSignalValue(player.liveMode);
   const [osd, setOsd] = useState(true);
@@ -176,12 +180,6 @@ export function VideoPlayer(props: VideoPlayerProps): VNode {
     }
   }, [osd]);
 
-  // "Up next" takes focus when it appears.
-  const upNextKey = upNext ? upNext.index + ':' + (upNext.countdown != null) : '';
-  useEffect(() => {
-    if (upNext) requestAnimationFrame(() => manager.focusById('kb-upnext-play'));
-  }, [upNextKey]);
-
   usePlayerKeys(player, {
     focusManager: manager,
     onCommand: (_key, icon) => {
@@ -193,12 +191,15 @@ export function VideoPlayer(props: VideoPlayerProps): VNode {
     onInfo: () => (osd ? setOsd(false) : show()),
   });
 
-  const latest = useRef({ osd, settings, settingsEntry, upNext, error, live });
-  latest.current = { osd, settings, settingsEntry, upNext, error, live };
+  const latest = useRef({ osd, settings, settingsEntry, error, live });
+  latest.current = { osd, settings, settingsEntry, error, live };
   useEffect(
     () =>
       manager.onKey((key) => {
         const s = latest.current;
+        // An app overlay owns the keys while focus is inside it.
+        const focused = manager.current;
+        if (focused && root.current && root.current.contains(focused) && focused.closest('[data-kb-overlay]')) return false;
         if (s.error && s.error.fatal) {
           if (key === 'back' && props.onBack) {
             props.onBack();
@@ -214,14 +215,6 @@ export function VideoPlayer(props: VideoPlayerProps): VNode {
           }
           bump();
           return false;
-        }
-        if (s.upNext) {
-          if (key === 'back') {
-            player.dismissUpNext();
-            show('kb-player-play');
-            return true;
-          }
-          if (key === 'enter' || ((key === 'left' || key === 'right') && !s.osd)) return false;
         }
         if (!s.osd) {
           if ((key === 'left' || key === 'right') && s.live !== 'live') {
@@ -284,11 +277,10 @@ export function VideoPlayer(props: VideoPlayerProps): VNode {
               <ProgressBar onActivity={bump} />
               <TimeCounter />
             </div>
-            <TransportControls onOpenSettings={(sec) => openSettings(sec || 'root')} onToggleStats={props.showStats === false ? undefined : () => setStats((v) => !v)} extra={props.extraControls} skipButtons={props.skipButtons} onActivity={bump} />
+            <TransportControls onOpenSettings={(sec) => openSettings(sec || 'root')} onToggleStats={props.showStats === false ? undefined : () => setStats((v) => !v)} extra={props.extraControls} start={props.transportStart} end={props.transportEnd} onActivity={bump} />
           </div>
         </div>
         {stats ? <StatsOverlay /> : null}
-        {upNext && !error ? <UpNextCard info={upNext} render={props.renderUpNext} /> : null}
         {settings ? <SettingsPanel section={settings} onSection={setSettings} onClose={closeSettings} /> : null}
         <ErrorPanel onRetry={retry} onBack={props.onBack} />
       </div>,

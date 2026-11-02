@@ -97,24 +97,14 @@ export function TimeCounter(): VNode {
 }
 TimeCounter.displayName = 'TimeCounter';
 
-/** LIVE indicator; focusable "go live" button when behind the live edge (DVR). */
+/** LIVE indicator (not interactive; apps add their own "go live" control with player.seekToLiveHead()). */
 export function LiveBadge(): VNode {
-  const player = usePlayer();
   const strings = useStrings();
-  useSignalValue(player.currentTime);
-  const atHead = player.isAtLiveHead();
   return (
-    <button
-      type="button"
-      className={['kb-live', { 'kb-live--behind': !atHead }]}
-      focusable={!atHead}
-      focusId="kb-player-live"
-      onClick={() => player.seekToLiveHead()}
-      aria-label={atHead ? strings.live : strings.goLive}
-    >
+    <div className="kb-live" aria-label={strings.live}>
       <span className="kb-live__dot" />
-      {atHead ? strings.live : strings.goLive}
-    </button>
+      {strings.live}
+    </div>
   );
 }
 LiveBadge.displayName = 'LiveBadge';
@@ -229,19 +219,19 @@ export interface TransportControlsProps {
   onToggleStats?: () => void;
   /** Extra buttons appended to the right group. */
   extra?: Child;
-  /** Previous / next buttons around the transport for playlists. Default true. */
-  skipButtons?: boolean;
+  /** Extra buttons before the rewind button (left group), e.g. "previous". */
+  start?: Child;
+  /** Extra buttons after the forward button (left group), e.g. "next". */
+  end?: Child;
   onActivity?: () => void;
 }
 
-/** Previous / -10 / play-pause / +10 / next, plus captions, audio and settings. */
+/** -10 / play-pause / +10, plus captions, audio and settings; apps add their own buttons through `start`, `end` and `extra`. */
 export function TransportControls(props: TransportControlsProps): VNode {
   const player = usePlayer();
   const strings = useStrings();
   const state = useSignalValue(player.state);
   const live = useSignalValue(player.liveMode);
-  const list = useSignalValue(player.playlist);
-  useSignalValue(player.playlistIndex);
   const captions = useSignalValue(player.captionTracks);
   const caption = useSignalValue(player.captionTrack);
   const audio = useSignalValue(player.audioTracks);
@@ -254,7 +244,7 @@ export function TransportControls(props: TransportControlsProps): VNode {
   return (
     <div className="kb-transport" focusGroup={{ orientation: 'horizontal' }}>
       <div className="kb-transport__group">
-        {list.length > 1 && props.skipButtons !== false ? <Button icon="previous" ariaLabel={strings.previous} disabled={!player.hasPrevious() && live !== 'none'} onClick={act(() => player.previousVideo())} /> : null}
+        {props.start}
         {canSeek ? <Button icon="replay10" ariaLabel={strings.rewind} onClick={act(() => player.seekBy(-10))} /> : null}
         <Button
           icon={playing ? 'pause' : 'play'}
@@ -264,7 +254,7 @@ export function TransportControls(props: TransportControlsProps): VNode {
           onClick={act(() => player.togglePlay())}
         />
         {canSeek ? <Button icon="forward10" ariaLabel={strings.forward} onClick={act(() => player.seekBy(10))} /> : null}
-        {list.length > 1 && props.skipButtons !== false ? <Button icon="next" ariaLabel={strings.next} disabled={!player.hasNext()} onClick={act(() => player.nextVideo())} /> : null}
+        {props.end}
       </div>
       <div className="kb-transport__group kb-transport__group--end">
         {props.extra}
@@ -284,13 +274,10 @@ TransportControls.displayName = 'TransportControls';
 export function MetadataSection(props: { children?: Child }): VNode {
   const player = usePlayer();
   const src = useSignalValue(player.source);
-  const list = useSignalValue(player.playlist);
-  const index = useSignalValue(player.playlistIndex);
   return (
     <div className="kb-meta">
       {src && src.title ? <div className="kb-meta__title">{src.title}</div> : null}
       {src && src.subtitle ? <div className="kb-meta__subtitle">{src.subtitle}</div> : null}
-      {list.length > 1 ? <div className="kb-meta__position">{index + 1} / {list.length}</div> : null}
       {props.children}
     </div>
   );

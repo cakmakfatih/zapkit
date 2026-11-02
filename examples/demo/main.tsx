@@ -18,6 +18,7 @@ import {
   toast,
   useEffect,
   useMemo,
+  useSignalValue,
   type RouteProps,
 } from '../../src/index';
 import { Player, VideoPlayer, type VideoSource } from '../../src/player/index';
@@ -66,6 +67,13 @@ function Home({ router }: RouteProps) {
   );
 }
 
+// The player has no playlist buttons of its own: an app adds the ones it wants through transportStart/End.
+function SkipButton({ player, dir }: { player: Player; dir: 'previous' | 'next' }) {
+  useSignalValue(player.playlistIndex);
+  const can = dir === 'next' ? player.hasNext() : player.hasPrevious();
+  return <Button icon={dir} ariaLabel={dir} disabled={!can} onClick={() => (dir === 'next' ? player.nextVideo() : player.previousVideo())} />;
+}
+
 function Watch({ params, query, router }: RouteProps<{ index: string }>) {
   const player = useMemo(() => new Player(), []);
   useEffect(() => {
@@ -75,7 +83,15 @@ function Watch({ params, query, router }: RouteProps<{ index: string }>) {
     player.play();
     return () => player.destroy();
   }, []);
-  return <VideoPlayer player={player} onBack={() => router.back()} />;
+  const playlist = !!query.playlist;
+  return (
+    <VideoPlayer
+      player={player}
+      onBack={() => router.back()}
+      transportStart={playlist ? <SkipButton player={player} dir="previous" /> : null}
+      transportEnd={playlist ? <SkipButton player={player} dir="next" /> : null}
+    />
+  );
 }
 
 const router = createRouter({

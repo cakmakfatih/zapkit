@@ -15,8 +15,6 @@ export function usePlayer(): Player {
 export interface PlayerStrings {
   play: string;
   pause: string;
-  previous: string;
-  next: string;
   rewind: string;
   forward: string;
   captions: string;
@@ -33,11 +31,6 @@ export interface PlayerStrings {
   textColor: string;
   background: string;
   live: string;
-  goLive: string;
-  upNext: string;
-  playNow: string;
-  cancel: string;
-  startsIn: string;
   retry: string;
   errorTitle: string;
   back: string;
@@ -46,8 +39,6 @@ export interface PlayerStrings {
 export const DEFAULT_STRINGS: PlayerStrings = {
   play: 'Play',
   pause: 'Pause',
-  previous: 'Previous',
-  next: 'Next',
   rewind: 'Back 10 seconds',
   forward: 'Forward 10 seconds',
   captions: 'Subtitles',
@@ -64,11 +55,6 @@ export const DEFAULT_STRINGS: PlayerStrings = {
   textColor: 'Text colour',
   background: 'Background',
   live: 'LIVE',
-  goLive: 'Go live',
-  upNext: 'Up next',
-  playNow: 'Play now',
-  cancel: 'Cancel',
-  startsIn: 'Starts in {s}s',
   retry: 'Retry',
   errorTitle: 'This video cannot be played',
   back: 'Back',

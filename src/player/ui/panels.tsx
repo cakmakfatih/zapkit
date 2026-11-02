@@ -2,14 +2,12 @@ import { useEffect, useSignalValue, useState } from '../../core/hooks';
 import { h, type Child, type VNode } from '../../core/vnode';
 import { Button } from '../../ui/basic';
 import { Icon } from '../../ui/icons';
-import { Image } from '../../ui/basic';
-import type { UpNextInfo } from '../player';
 import type { CaptionSettings } from '../types';
 import { usePlayer, useStrings } from './context';
 
 /*
- * Side panels and cards drawn over the video: settings menu, stats for
- * nerds, "Up next" (next episode) and the error panel.
+ * Side panels drawn over the video: settings menu, stats for nerds and the
+ * error panel. App-specific cards (e.g. "up next") are built by the app.
  */
 
 export type SettingsSection = 'root' | 'quality' | 'speed' | 'audio' | 'captions' | 'captionStyle';
@@ -225,41 +223,6 @@ export function StatsOverlay(props: { interval?: number }): VNode {
   );
 }
 StatsOverlay.displayName = 'StatsOverlay';
-
-/**
- * "Up next" card for playlists and series. While only suggesting (near the
- * end) it is a small card; after the item ends it shows the auto-advance
- * countdown with Play now / Cancel.
- */
-export function UpNextCard(props: { info: UpNextInfo; render?: (info: UpNextInfo) => Child }): VNode {
-  const player = usePlayer();
-  const strings = useStrings();
-  const { info } = props;
-  const src = info.source;
-  const counting = info.countdown != null;
-  return (
-    <div className={['kb-upnext', { 'kb-upnext--countdown': counting }]} focusGroup={{ orientation: 'horizontal', trap: counting ? true : undefined }}>
-      {props.render ? (
-        props.render(info)
-      ) : (
-        <div className="kb-upnext__body">
-          {src.poster ? <Image className="kb-upnext__poster" src={src.poster} alt="" /> : null}
-          <div className="kb-upnext__text">
-            <div className="kb-upnext__eyebrow">{counting ? strings.startsIn.replace('{s}', String(info.countdown)) : strings.upNext}</div>
-            <div className="kb-upnext__title">{src.title || ''}</div>
-            {src.subtitle ? <div className="kb-upnext__subtitle">{src.subtitle}</div> : null}
-          </div>
-        </div>
-      )}
-      <div className="kb-upnext__actions">
-        <Button icon="next" label={strings.playNow} focusId="kb-upnext-play" autoFocus={counting} className="kb-upnext__play" onClick={() => player.playUpNext()} />
-        <Button label={strings.cancel} focusId="kb-upnext-cancel" onClick={() => player.dismissUpNext()} />
-      </div>
-      {counting ? <div className="kb-upnext__bar" style={{ animationDuration: info.countdown + 's' }} /> : null}
-    </div>
-  );
-}
-UpNextCard.displayName = 'UpNextCard';
 
 /** Fatal error message with Retry. */
 export function ErrorPanel(props: { onRetry?: () => void; onBack?: () => void }): VNode | null {
