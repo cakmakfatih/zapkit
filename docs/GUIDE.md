@@ -225,7 +225,7 @@ const theme = useContext(Theme);
 
 - `orientation`: `'horizontal' | 'vertical' | 'grid'`; directions the group does not handle pass to the parent group.
 - `trap`: `true` or an array of blocked directions (`['left','right']`).
-- `wrap`: past an edge the focus continues on the opposite side, in every direction the group handles.
+- `wrap`: past an edge the focus continues on the opposite side, in every direction the group handles. It only wraps when nothing outside the group lies in that direction (a field above a keyboard is reached before the keyboard wraps).
 - `memory` (default `true`): the child that was focused last when you return to the group.
 - `enterTo`: `'nearest'` (default), `'first'` or a `focusId`.
 

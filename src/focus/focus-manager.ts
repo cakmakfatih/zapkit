@@ -412,6 +412,8 @@ export class FocusManager {
     const fromRect = rectOf(from);
     let scope: Element | null = from.closest(GROUP);
     let exclude: Element | null = null;
+    // A wrapping group only wraps when nothing outside it lies in that direction.
+    let wrapTo: Element | null = null;
     while (true) {
       const container: Element = scope && this.root.contains(scope) ? scope : this.root;
       const opts = scope ? groupOptions(scope) : {};
@@ -421,10 +423,7 @@ export class FocusManager {
           const target = this.isFocusable(best) ? best : this.entryOf(best, fromRect, dir);
           if (target && this.focus(target, { reason: 'navigation' })) return target;
         }
-        if (scope && opts.wrap) {
-          const wrapped = this.wrapTarget(container, fromRect, dir, from);
-          if (wrapped && this.focus(wrapped, { reason: 'navigation' })) return wrapped;
-        }
+        if (scope && opts.wrap && !wrapTo) wrapTo = this.wrapTarget(container, fromRect, dir, from);
       }
       if (!scope || container === this.root) break;
       if (isTrapped(opts, dir)) break;
@@ -433,6 +432,7 @@ export class FocusManager {
       scope = parent ? parent.closest(GROUP) : null;
       if (scope && !this.root.contains(scope)) scope = null;
     }
+    if (wrapTo && this.focus(wrapTo, { reason: 'navigation' })) return wrapTo;
     from.dispatchEvent(new CustomEvent('kbedge', { bubbles: true, detail: { direction: dir } }));
     return null;
   }
