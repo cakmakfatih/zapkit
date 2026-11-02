@@ -65,7 +65,6 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
   min-height: 4.125rem;
   padding: 0 1.875rem;
   border: 0;
@@ -74,6 +73,9 @@ body {
   color: var(--kb-text);
   font: 500 1.5rem/1 var(--kb-font);
   white-space: nowrap;
+}
+.kb-button > * + * {
+  margin-left: 0.75rem;
 }
 .kb-button--icon {
   width: 4.125rem;
@@ -215,8 +217,10 @@ body {
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
   z-index: 110;
+}
+.kb-toast-stage > * + * {
+  margin-top: 0.75rem;
 }
 .kb-toast {
   padding: 1.125rem 2.25rem;
@@ -295,9 +299,11 @@ body {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 0.375rem;
   pointer-events: none;
   transition: bottom 250ms var(--kb-ease);
+}
+.kb-captions > * + * {
+  margin-top: 0.375rem;
 }
 .kb-captions--raised {
   bottom: 30%;
@@ -345,8 +351,10 @@ body {
 .kb-osd__timeline {
   display: flex;
   align-items: center;
-  gap: 2.25rem;
   margin-bottom: 1.875rem;
+}
+.kb-osd__timeline > * + * {
+  margin-left: 2.25rem;
 }
 
 .kb-meta__title {
@@ -370,7 +378,6 @@ body {
 .kb-live {
   display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
   padding: 0.5625rem 1.3125rem;
   border: 0;
   border-radius: 999px;
@@ -380,6 +387,8 @@ body {
   letter-spacing: 0.06em;
 }
 .kb-live__dot {
+  /* The label is a bare text node, so the gap goes on the dot. */
+  margin-right: 0.75rem;
   width: 0.75rem;
   height: 0.75rem;
   border-radius: 50%;
@@ -454,8 +463,10 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
   pointer-events: none;
+}
+.kb-progress__preview > * + * {
+  margin-top: 0.75rem;
 }
 .kb-progress__frame {
   border-radius: var(--kb-radius-sm);
@@ -480,7 +491,9 @@ body {
 .kb-transport__group {
   display: flex;
   align-items: center;
-  gap: 1.125rem;
+}
+.kb-transport__group > * + * {
+  margin-left: 1.125rem;
 }
 .kb-transport .kb-button {
   background: rgba(255, 255, 255, 0.12);
@@ -559,20 +572,24 @@ body {
 .kb-settings__title {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
   margin: 0 0 1.5rem 1.125rem;
   font-size: 2.0625rem;
   font-weight: 700;
 }
+.kb-settings__title > .kb-icon {
+  /* The title is a bare text node after the back icon, so the gap goes on the icon. */
+  margin-right: 0.75rem;
+}
 .kb-settings__menu {
   display: flex;
   flex-direction: column;
-  gap: 0.375rem;
+}
+.kb-settings__menu > * + * {
+  margin-top: 0.375rem;
 }
 .kb-settings__row {
   display: flex;
   align-items: center;
-  gap: 1.125rem;
   min-height: 4.5rem;
   padding: 0 1.3125rem;
   border: 0;
@@ -581,6 +598,9 @@ body {
   color: #fff;
   font: 400 1.5938rem/1.2 var(--kb-font);
   text-align: left;
+}
+.kb-settings__row > * + * {
+  margin-left: 1.125rem;
 }
 .kb-settings__row.kb-focused {
   background: #fff;
@@ -617,7 +637,9 @@ body {
 }
 .kb-stats__row {
   display: flex;
-  gap: 1.5rem;
+}
+.kb-stats__row > * + * {
+  margin-left: 1.5rem;
 }
 .kb-stats__key {
   width: 16.5rem;
@@ -634,9 +656,11 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1.5rem;
   background: rgba(0, 0, 0, 0.85);
   text-align: center;
+}
+.kb-player-error > * + * {
+  margin-top: 1.5rem;
 }
 .kb-player-error__title {
   font-size: 2.625rem;
@@ -648,8 +672,10 @@ body {
 }
 .kb-player-error__actions {
   display: flex;
-  gap: 1.5rem;
-  margin-top: 1.5rem;
+  margin-top: 3rem; /* the 1.5rem column gap plus its own 1.5rem */
+}
+.kb-player-error__actions > * + * {
+  margin-left: 1.5rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -665,17 +691,20 @@ body {
 .kb-keyboard {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+}
+.kb-keyboard > * + * {
+  margin-top: 0.75rem;
 }
 .kb-keyboard__row {
   display: flex;
-  gap: 0.75rem;
+}
+.kb-keyboard__row > * + * {
+  margin-left: 0.75rem;
 }
 .kb-key {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
   flex: 1;
   height: 4rem;
   border: 0;
@@ -683,6 +712,9 @@ body {
   background: var(--kb-surface-2);
   color: var(--kb-text);
   font: 700 1.5rem/1 var(--kb-font);
+}
+.kb-key > * + * {
+  margin-left: 0.5rem;
 }
 .kb-key .kb-icon {
   width: 1.75rem;

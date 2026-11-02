@@ -1,6 +1,6 @@
 {
   "name": "zapkit-tv",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A small React-like UI library for TV web apps: incremental-dom rendering, D-pad focus, store, router, virtual lists and a full video player.",
   "keywords": [
     "tv",

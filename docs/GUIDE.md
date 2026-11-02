@@ -79,7 +79,8 @@ for TV browsers; its source shows the library in use.
   animate without a relayout.
 - **Old-browser friendly.** The library compiles to ES2017 and has a single dependency. The example app
   targets Chrome 69-era TV browsers; its whole application script is about 73 kB gzipped, and hls.js loads
-  separately.
+  separately. The stylesheet spaces flex items with margins instead of `gap`, which older TV browsers
+  (before Chromium 84) ignore for flexbox; keep that in mind for your own styles.
 
 ### 1.4 The player
 

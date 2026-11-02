@@ -68,7 +68,8 @@ Extensions).
   low-end GPUs can animate without relayout.
 - **Old-browser friendly.** The library compiles to ES2017 with a single dependency, and the example
   app targets Chrome 69 era TV browsers. F-IPTV's whole application script is about 73 kB gzipped; hls.js
-  loads separately and only when needed.
+  loads separately and only when needed. The stylesheet spaces flex items with margins instead of
+  `gap`, which older TV browsers (before Chromium 84) ignore for flexbox.
 
 ## The player
 
