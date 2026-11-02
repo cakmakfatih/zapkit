@@ -1,0 +1,53 @@
+{
+  "name": "zapkit-tv",
+  "version": "0.1.0",
+  "private": true,
+  "description": "React-like UI library for TV web apps: keyed incremental rendering, D-pad focus, store, router, virtual lists and a full video player.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": [
+    "*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./jsx-runtime": {
+      "types": "./dist/jsx-runtime.d.ts",
+      "default": "./dist/jsx-runtime.js"
+    },
+    "./jsx-dev-runtime": {
+      "types": "./dist/jsx-runtime.d.ts",
+      "default": "./dist/jsx-runtime.js"
+    },
+    "./player": {
+      "types": "./dist/player/index.d.ts",
+      "default": "./dist/player/index.js"
+    },
+    "./styles.css": "./styles/zapkit-tv.css"
+  },
+  "files": [
+    "dist",
+    "styles",
+    "docs"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node test/run.mjs",
+    "demo": "vite examples/demo",
+    "demo:build": "vite build examples/demo"
+  },
+  "dependencies": {
+    "incremental-dom": "0.7.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "vite": "^5.4.0",
+    "jsdom": "^25.0.0",
+    "esbuild": "^0.21.5"
+  }
+}

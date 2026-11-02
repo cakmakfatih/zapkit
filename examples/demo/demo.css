@@ -1,0 +1,12 @@
+.demo-home { position: absolute; inset: 0; padding: 4.5rem 6rem; }
+.demo-home h1 { margin: 0 0 0.5rem; font-size: 4rem; letter-spacing: -0.02em; }
+.demo-home p { margin: 0 0 3rem; color: var(--kb-text-dim); font-size: 1.75rem; }
+.demo-row-title { margin: 2.5rem 0 1rem; font-size: 2rem; font-weight: 700; }
+.demo-card { position: absolute; inset: 0; border-radius: var(--kb-radius); overflow: hidden; background: var(--kb-surface-2);
+  transition: transform var(--kb-duration) var(--kb-ease), box-shadow var(--kb-duration); }
+.kb-vlist__item.kb-focused { box-shadow: none; }
+.kb-vlist__item.kb-focused .demo-card { transform: scale(1.08); box-shadow: var(--kb-focus-ring); }
+.demo-card__art { position: absolute; inset: 0; }
+.demo-card__label { position: absolute; left: 0; right: 0; bottom: 0; padding: 1.5rem; font-size: 1.6rem; font-weight: 600;
+  background: linear-gradient(transparent, rgba(0,0,0,.8)); }
+.demo-actions { display: flex; gap: 1.5rem; margin-top: 3rem; }
