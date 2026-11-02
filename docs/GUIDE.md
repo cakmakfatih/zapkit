@@ -351,9 +351,37 @@ Shows thousands of items by rendering only the visible ones, and keeps the focus
 - `Image` (loading/loaded/error states, `fallback`)
 - `Marquee` (scrolls long text while focused), `Spinner`, `Icon`
 - Icons: the built-in set is filled paths (`registerIcons({ name: 'M…' })`). Outline icon sets such as Lucide are registered as inner SVG markup with `registerStrokeIcons({ name: '<path d="…"/>' })` and drawn in `currentColor`.
+- `OnScreenKeyboard`: a D-pad keyboard that only draws keys and reports text; the host owns the
+  value, layout, language and what "done" does (see below).
 - `openOverlay(close => <Dialog/>, { className: 'kb-overlay--sheet' })` + `<OverlayStage/>`: modal layers that close with the back key and keep focus inside
 - `toast('Saved', { kind: 'success' })` + `<ToastStage/>`
 - `animate(el, keyframes, opts)`, `fadeIn`, `fadeOut`
+
+### OnScreenKeyboard
+
+```tsx
+const [text, setText] = useState('');
+<OnScreenKeyboard
+  value={text}
+  onChange={setText}
+  onSubmit={() => search(text)}
+  layout={myLayout}                 // string[][] in upper case; default: QWERTY_LAYOUT
+  locale="tr-TR"                    // so I/ı and İ/i pair up when the case changes
+  strings={{ done: 'OK', clear: 'Erase' }}   // accessible names of the icon keys
+  buttons={{ clear: false }}        // action keys left out are not rendered at all
+  reveal={{ shown, onToggle }}      // adds a show/hide key (passwords)
+  initialShift={false}              // start in abc instead of Aa
+  focusPrefix="vk"                  // focus ids: vk-<row>-<column>, vk-shift, vk-done …
+/>
+```
+
+The shift key works like a phone's: **abc** (lower case) → **Aa** (the next letter is a
+capital, then back to abc) → **AA** (caps lock) → abc. It starts on Aa when the value is
+empty (unless `initialShift` says otherwise) and is never changed behind the user's back.
+Digits and symbols do not use up the shift, only letters do. Focus wraps around at the
+edges in every direction. The action keys (shift, clear, space, delete, done, reveal) are
+icons: `shift`, `caps`, `trash`, `space`, `backspace`, `enter`, `eye`, `eyeOff` are built in as simple
+outlines and an app can replace them with `registerStrokeIcons`.
 
 ---
 

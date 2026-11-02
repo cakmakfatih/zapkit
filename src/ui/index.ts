@@ -5,6 +5,8 @@ export { Icon, registerIcons, registerStrokeIcons } from './icons';
 export type { IconName } from './icons';
 export { Button, IconButton, Spinner, Marquee, Image } from './basic';
 export type { ButtonProps } from './basic';
+export { OnScreenKeyboard, QWERTY_LAYOUT, DEFAULT_KEYBOARD_STRINGS } from './keyboard';
+export type { OnScreenKeyboardProps, KeyboardStrings, KeyboardButtons } from './keyboard';
 export { VirtualList } from './virtual-list';
 export type { VirtualListProps } from './virtual-list';
 export { OverlayController, OverlayStage, overlays, openOverlay, ToastStage, toast, toasts } from './overlay';

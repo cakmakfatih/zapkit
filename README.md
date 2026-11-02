@@ -30,8 +30,8 @@ player.play();
 - **Everything is replaceable.** All visible text lives in `PlayerStrings` (English by
   default, pass `strings` to translate), and built-in buttons the app does not want are not
   rendered at all (`controls` prop).
-- **TV UI parts.** `VirtualList` (lists and grids), `Button`, `Image`, `Marquee`,
-  overlays, toasts, scaling to a 1920×1080 design canvas and icon helpers (filled and
+- **TV UI parts.** `VirtualList` (lists and grids), `OnScreenKeyboard` (D-pad keyboard with a
+  phone-style shift key), `Button`, `Image`, `Marquee`, overlays, toasts, scaling to a 1920×1080 design canvas and icon helpers (filled and
   outline icon sets).
 
 ## Documentation

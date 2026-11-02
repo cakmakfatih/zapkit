@@ -31,7 +31,16 @@ const PATHS: Record<string, string> = {
 };
 
 /** Outline icons: inner SVG markup (24x24 grid, stroked with currentColor), e.g. from an icon set. */
-const STROKE: Record<string, string> = {};
+const STROKE: Record<string, string> = {
+  shift: '<path d="M12 3 4 12h5v6h6v-6h5z"/>',
+  caps: '<path d="M12 3 4 12h5v6h6v-6h5z"/><path d="M9 21.5h6"/>',
+  trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+  space: '<path d="M4 10v5h16v-5"/>',
+  backspace: '<path d="M9 5h11v14H9l-6-7z"/><path d="m12.5 9.5 5 5m0-5-5 5"/>',
+  enter: '<path d="M20 5v8H6m4-4-4 4 4 4"/>',
+  eye: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  eyeOff: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path d="M3 3l18 18"/>',
+};
 
 export type IconName = keyof typeof PATHS | string;
 
