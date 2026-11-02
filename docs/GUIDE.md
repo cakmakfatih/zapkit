@@ -371,6 +371,7 @@ const [text, setText] = useState('');
   buttons={{ clear: false }}        // action keys left out are not rendered at all
   reveal={{ shown, onToggle }}      // adds a show/hide key (passwords)
   initialShift={false}              // start in abc instead of Aa
+  cursor={caret} onCursorChange={setCaret}   // optional: edit at a caret, draws the left/right keys
   focusPrefix="vk"                  // focus ids: vk-<row>-<column>, vk-shift, vk-done …
 />
 ```
@@ -380,7 +381,7 @@ capital, then back to abc) → **AA** (caps lock) → abc. It starts on Aa when 
 empty (unless `initialShift` says otherwise) and is never changed behind the user's back.
 Digits and symbols do not use up the shift, only letters do. Focus wraps around at the
 edges in every direction. The action keys (shift, clear, space, delete, done, reveal) are
-icons: `shift`, `caps`, `trash`, `space`, `backspace`, `enter`, `eye`, `eyeOff` are built in as simple
+icons: `shift`, `caps`, `trash`, `space`, `backspace`, `enter`, `eye`, `eyeOff`, `caretLeft`, `caretRight` are built in as simple
 outlines and an app can replace them with `registerStrokeIcons`.
 
 ---

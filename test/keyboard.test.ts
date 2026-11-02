@@ -83,3 +83,44 @@ test('keyboard: delete, clear, space and done report to the host; strings and la
   assert.deepEqual(calls, ['a', '', 'ab ', '<done>']);
   assert.equal(keys(root).filter((k) => /^[qw]$/i.test(k.textContent!.trim())).length, 2);
 });
+
+test('keyboard: with a caret, keys insert at it, delete removes before it and the arrows move it', async () => {
+  const root = document.createElement('div');
+  document.body.appendChild(root);
+  let value = 'ac';
+  let cursor = 1;
+  const draw = () =>
+    flushSync(() =>
+      render(
+        h(OnScreenKeyboard, {
+          value,
+          cursor,
+          initialShift: false,
+          onChange: (v: string) => (value = v),
+          onCursorChange: (c: number) => (cursor = c),
+          onSubmit: () => {},
+        } as any),
+        root,
+      ),
+    );
+  draw();
+  await click(byText(root, 'b'));
+  draw();
+  assert.equal(value, 'abc');
+  assert.equal(cursor, 2);
+  await click(byLabel(root, 'Move left')!);
+  draw();
+  assert.equal(cursor, 1);
+  await click(byLabel(root, 'Delete')!);
+  draw();
+  assert.equal(value, 'bc');
+  assert.equal(cursor, 0);
+  await click(byLabel(root, 'Move right')!);
+  assert.equal(cursor, 1);
+});
+
+test('keyboard: without onCursorChange there are no caret keys and typing appends', () => {
+  const { root } = mount({});
+  assert.equal(byLabel(root, 'Move left'), undefined);
+  assert.equal(byLabel(root, 'Move right'), undefined);
+});

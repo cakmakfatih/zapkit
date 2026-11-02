@@ -5,7 +5,9 @@ import { Icon } from './icons';
 
 /*
  * D-pad on-screen keyboard. It only draws keys and reports text: the host owns the
- * value, the layout, the language and what happens on "done". The shift key works like a
+ * value, layout, language and what happens on "done". When the host passes `onCursorChange`
+ * the keys edit at a caret (typing inserts, delete removes the letter before it) and two
+ * keys move the caret one letter left and right. The shift key works like a
  * phone's: abc (lower case), Aa (the next letter is a capital, then back to lower case)
  * and AA (caps lock); pressing it cycles abc → Aa → AA → abc and is never overridden.
  */
@@ -16,6 +18,8 @@ export interface KeyboardStrings {
   clear: string;
   space: string;
   delete: string;
+  left: string;
+  right: string;
   show: string;
   hide: string;
   done: string;
@@ -26,6 +30,8 @@ export const DEFAULT_KEYBOARD_STRINGS: KeyboardStrings = {
   clear: 'Clear',
   space: 'Space',
   delete: 'Delete',
+  left: 'Move left',
+  right: 'Move right',
   show: 'Show',
   hide: 'Hide',
   done: 'Done',
@@ -45,6 +51,9 @@ export interface KeyboardButtons {
   clear?: boolean;
   space?: boolean;
   delete?: boolean;
+  /** The caret keys; only drawn when `onCursorChange` is given. */
+  left?: boolean;
+  right?: boolean;
   done?: boolean;
 }
 
@@ -52,6 +61,10 @@ export interface OnScreenKeyboardProps {
   /** Current text; the host keeps it (controlled component). */
   value: string;
   onChange: (value: string) => void;
+  /** Caret position in `value` (0 to value.length). Default: the end. */
+  cursor?: number;
+  /** Turns on caret editing: called with the new caret position; draws the left/right keys. */
+  onCursorChange?: (cursor: number) => void;
   /** The "done" (enter) key. */
   onSubmit: () => void;
   /** Key rows. Default: QWERTY_LAYOUT. */
@@ -86,8 +99,19 @@ export function OnScreenKeyboard(props: OnScreenKeyboardProps): VNode {
 
   const isLetter = (k: string) => k.toLocaleLowerCase(locale) !== k.toLocaleUpperCase(locale);
   const label = (k: string) => (isLetter(k) ? (upper ? k.toLocaleUpperCase(locale) : k.toLocaleLowerCase(locale)) : k);
+  const caretOn = !!props.onCursorChange;
+  const caret = caretOn ? Math.max(0, Math.min(props.cursor == null ? props.value.length : props.cursor, props.value.length)) : props.value.length;
+  const insert = (text: string) => {
+    props.onChange(props.value.slice(0, caret) + text + props.value.slice(caret));
+    if (props.onCursorChange) props.onCursorChange(caret + text.length);
+  };
+  const removeBefore = () => {
+    if (caret <= 0) return;
+    props.onChange(props.value.slice(0, caret - 1) + props.value.slice(caret));
+    if (props.onCursorChange) props.onCursorChange(caret - 1);
+  };
   const press = (k: string) => {
-    props.onChange(props.value + label(k));
+    insert(label(k));
     if (isLetter(k) && mode === 'shift') setMode('lower');
   };
   const cycle = () => setMode(mode === 'lower' ? 'shift' : mode === 'shift' ? 'caps' : 'lower');
@@ -118,17 +142,30 @@ export function OnScreenKeyboard(props: OnScreenKeyboardProps): VNode {
           </button>
         ) : null}
         {b.clear !== false ? (
-          <button type="button" className="kb-key kb-key--wide" focusable focusId={prefix + '-clear'} aria-label={strings.clear} onClick={() => props.onChange('')}>
+          <button type="button" className="kb-key kb-key--wide" focusable focusId={prefix + '-clear'} aria-label={strings.clear} onClick={() => {
+            props.onChange('');
+            if (props.onCursorChange) props.onCursorChange(0);
+          }}>
             <Icon name="trash" />
           </button>
         ) : null}
+        {caretOn && b.left !== false ? (
+          <button type="button" className="kb-key kb-key--wide" focusable focusId={prefix + '-left'} aria-label={strings.left} onClick={() => props.onCursorChange!(Math.max(0, caret - 1))}>
+            <Icon name="caretLeft" />
+          </button>
+        ) : null}
+        {caretOn && b.right !== false ? (
+          <button type="button" className="kb-key kb-key--wide" focusable focusId={prefix + '-right'} aria-label={strings.right} onClick={() => props.onCursorChange!(Math.min(props.value.length, caret + 1))}>
+            <Icon name="caretRight" />
+          </button>
+        ) : null}
         {b.space !== false ? (
-          <button type="button" className="kb-key kb-key--space" focusable focusId={prefix + '-space'} aria-label={strings.space} onClick={() => props.onChange(props.value + ' ')}>
+          <button type="button" className="kb-key kb-key--space" focusable focusId={prefix + '-space'} aria-label={strings.space} onClick={() => insert(' ')}>
             <Icon name="space" />
           </button>
         ) : null}
         {b.delete !== false ? (
-          <button type="button" className="kb-key kb-key--wide" focusable focusId={prefix + '-delete'} aria-label={strings.delete} onClick={() => props.onChange(props.value.slice(0, -1))}>
+          <button type="button" className="kb-key kb-key--wide" focusable focusId={prefix + '-delete'} aria-label={strings.delete} onClick={removeBefore}>
             <Icon name="backspace" />
           </button>
         ) : null}

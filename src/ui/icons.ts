@@ -36,6 +36,8 @@ const STROKE: Record<string, string> = {
   caps: '<path d="M12 3 4 12h5v6h6v-6h5z"/><path d="M9 21.5h6"/>',
   trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
   space: '<path d="M4 10v5h16v-5"/>',
+  caretLeft: '<path d="m15 5-7 7 7 7"/>',
+  caretRight: '<path d="m9 5 7 7-7 7"/>',
   backspace: '<path d="M9 5h11v14H9l-6-7z"/><path d="m12.5 9.5 5 5m0-5-5 5"/>',
   enter: '<path d="M20 5v8H6m4-4-4 4 4 4"/>',
   eye: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
