@@ -10,9 +10,11 @@ subtitles, playlists and DRM.
 > not real TVs or real streams). APIs can change without notice. If you want to build on it,
 > please **fork the repository** and treat it as experimental. Bug reports are welcome.
 
-**Example project:** [F-IPTV](https://f-iptv.tvkit.workers.dev/), an IPTV app for TVs (live TV,
-movies, series, profiles and a PIN) built entirely on zapkit-tv. It is a PWA, so it can be installed
-from the browser.
+**Source:** <https://github.com/cakmakfatih/zapkit-tv>
+
+**Example project:** [F-IPTV](https://github.com/cakmakfatih/f-iptv), an IPTV player for TVs (live TV,
+movies, series, profiles and a PIN) built entirely on zapkit-tv. Its source shows how the library is used in a
+real app.
 
 ```tsx
 import { h, render, focus, installScaling } from 'zapkit-tv';

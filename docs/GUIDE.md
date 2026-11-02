@@ -51,8 +51,9 @@ signature handling, ad handling or DRM circumvention. The player is built purely
 (HTMLMediaElement, Media Source Extensions, Encrypted Media Extensions). zapkit-tv is not affiliated with or
 endorsed by YouTube or Google.
 
-A real app built on it, **F-IPTV**, is live at <https://f-iptv.tvkit.workers.dev/>. It is an IPTV player
-(live TV, movies, series, profiles, PIN lock) for TV browsers and is also an installable PWA.
+The library's source is at <https://github.com/cakmakfatih/zapkit-tv>. A real app built on it, **F-IPTV**
+(<https://github.com/cakmakfatih/f-iptv>), is an IPTV player (live TV, movies, series, profiles, PIN lock)
+for TV browsers; its source shows the library in use.
 
 ### 1.2 Technologies and what they are for
 
