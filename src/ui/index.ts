@@ -1,7 +1,7 @@
 export { installScaling, dp, toScreenPx, toDesignPx, getScale } from './scaling';
 export type { ScalingOptions } from './scaling';
 export { animate, fadeIn, fadeOut } from './animate';
-export { Icon, registerIcons } from './icons';
+export { Icon, registerIcons, registerStrokeIcons } from './icons';
 export type { IconName } from './icons';
 export { Button, IconButton, Spinner, Marquee, Image } from './basic';
 export type { ButtonProps } from './basic';

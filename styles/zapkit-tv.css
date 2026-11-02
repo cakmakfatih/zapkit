@@ -99,6 +99,10 @@ body {
   vertical-align: middle;
   fill: currentColor;
 }
+.kb-icon--stroke {
+  fill: none;
+  stroke: currentColor;
+}
 
 .kb-spinner {
   width: 4.5rem;

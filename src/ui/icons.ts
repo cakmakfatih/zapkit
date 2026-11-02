@@ -30,13 +30,39 @@ const PATHS: Record<string, string> = {
   playlist: 'M3 6h12v2H3zm0 4h12v2H3zm0 4h8v2H3zm14-2v6l5-3z',
 };
 
+/** Outline icons: inner SVG markup (24x24 grid, stroked with currentColor), e.g. from an icon set. */
+const STROKE: Record<string, string> = {};
+
 export type IconName = keyof typeof PATHS | string;
 
 export function registerIcons(paths: Record<string, string>): void {
   Object.assign(PATHS, paths);
 }
 
+/** Registers outline icons given as inner SVG markup (shapes only, no <svg> wrapper). */
+export function registerStrokeIcons(markup: Record<string, string>): void {
+  Object.assign(STROKE, markup);
+}
+
 export function Icon(props: { name: IconName; size?: string; className?: string; label?: string }): VNode {
+  const inner = STROKE[props.name];
+  if (inner) {
+    return h('svg', {
+      className: ['kb-icon', 'kb-icon--stroke', props.className],
+      viewBox: '0 0 24 24',
+      width: props.size || '1em',
+      height: props.size || '1em',
+      fill: 'none',
+      stroke: 'currentColor',
+      'stroke-width': '2',
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'round',
+      role: props.label ? 'img' : null,
+      'aria-label': props.label || null,
+      'aria-hidden': props.label ? null : 'true',
+      dangerouslySetInnerHTML: { __html: inner },
+    });
+  }
   const d = PATHS[props.name] || '';
   return h(
     'svg',
