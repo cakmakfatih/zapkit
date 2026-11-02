@@ -90,3 +90,29 @@ test('VideoPlayer: a WebVTT subtitle track adds the subtitles button; without tr
   assert.ok(labels(withTrack.root).includes('Subtitles'), 'the subtitles button appears');
   withTrack.player.destroy();
 });
+
+test('Player: the mute applied after blocked autoplay is not saved as the viewer\'s choice', async () => {
+  // jsdom without a URL has no storage; a small in-memory one is enough here.
+  const store = new Map<string, string>();
+  Object.defineProperty(globalThis, 'localStorage', {
+    value: { getItem: (k: string) => (store.has(k) ? store.get(k)! : null), setItem: (k: string, v: string) => void store.set(k, String(v)), removeItem: (k: string) => void store.delete(k), clear: () => store.clear() },
+    configurable: true,
+  });
+  const player = new Player({ persistPrefs: true });
+  const video = (player as any).video as HTMLVideoElement;
+  let calls = 0;
+  (video as any).play = () => (++calls === 1 ? Promise.reject(Object.assign(new Error('blocked'), { name: 'NotAllowedError' })) : Promise.resolve());
+  await player.play();
+  assert.equal(video.muted, true, 'falls back to muted playback');
+  video.dispatchEvent(new window.Event('volumechange'));
+  assert.notEqual(localStorage.getItem('kb-player-muted'), 'true', 'not stored');
+  // The viewer unmutes: that choice is stored as usual.
+  video.muted = false;
+  video.dispatchEvent(new window.Event('volumechange'));
+  assert.equal(localStorage.getItem('kb-player-muted'), 'false');
+  // And a deliberate mute afterwards is stored.
+  video.muted = true;
+  video.dispatchEvent(new window.Event('volumechange'));
+  assert.equal(localStorage.getItem('kb-player-muted'), 'true');
+  player.destroy();
+});

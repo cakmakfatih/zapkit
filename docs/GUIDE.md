@@ -384,6 +384,18 @@ edges in every direction. The action keys (shift, clear, space, delete, done, re
 icons: `shift`, `caps`, `trash`, `space`, `backspace`, `enter`, `eye`, `eyeOff`, `caretLeft`, `caretRight` are built in as simple
 outlines and an app can replace them with `registerStrokeIcons`.
 
+**One keyboard, not two.** TVs and touch-only devices open their own keyboard when a text field
+gets focus, which would stack on top of `OnScreenKeyboard`. `hasSystemKeyboard()` tells whether the
+device is one of those (`isTvDevice()` checks for a TV browser only) and `suppressSystemKeyboard()`
+returns the field props that keep it closed (`readOnly` and `inputmode="none"`; empty on a desktop):
+
+```tsx
+<input value={text} {...suppressSystemKeyboard()} />
+```
+
+A read-only field takes no typing or paste by itself, so the host writes typed keys (`keydown`)
+and pasted text (`paste`) into its value.
+
 ---
 
 ## 10. Player

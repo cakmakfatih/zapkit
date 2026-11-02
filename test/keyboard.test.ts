@@ -1,7 +1,7 @@
 import { tick } from './setup';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { h, render, flushSync, OnScreenKeyboard } from '../src/index';
+import { h, render, flushSync, OnScreenKeyboard, hasSystemKeyboard, suppressSystemKeyboard } from '../src/index';
 
 function mount(props: Record<string, unknown>) {
   const root = document.createElement('div');
@@ -123,4 +123,19 @@ test('keyboard: without onCursorChange there are no caret keys and typing append
   const { root } = mount({});
   assert.equal(byLabel(root, 'Move left'), undefined);
   assert.equal(byLabel(root, 'Move right'), undefined);
+});
+
+test('system keyboard: a TV user agent keeps the field read-only, a desktop does not', () => {
+  const ua = Object.getOwnPropertyDescriptor(window.navigator, 'userAgent');
+  const set = (v: string) => Object.defineProperty(window.navigator, 'userAgent', { value: v, configurable: true });
+  try {
+    set('Mozilla/5.0 (X11; Linux armv7l) VIDAA/9.0 SmartTV');
+    assert.equal(hasSystemKeyboard(), true);
+    assert.deepEqual(suppressSystemKeyboard(), { readOnly: true, inputmode: 'none' });
+    set('Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120');
+    assert.equal(hasSystemKeyboard(), false);
+    assert.deepEqual(suppressSystemKeyboard(), {});
+  } finally {
+    if (ua) Object.defineProperty(window.navigator, 'userAgent', ua);
+  }
 });

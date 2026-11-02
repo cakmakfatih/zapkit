@@ -86,6 +86,8 @@ export class Player {
   readonly bufferedEnd: Signal<number> = signal(0);
   readonly volume: Signal<number> = signal(100);
   readonly muted: Signal<boolean> = signal(false);
+  /** The browser blocked autoplay with sound and we muted the video ourselves: not the viewer's choice, so not saved. */
+  private autoplayMuted = false;
   readonly playbackRate: Signal<number> = signal(1);
   readonly qualities: Signal<QualityLevel[]> = signal([]);
   readonly quality: Signal<QualityLevel | null> = signal(null);
@@ -345,6 +347,7 @@ export class Player {
     return p.catch((e: Error) => {
       // Autoplay with sound blocked (desktop browsers): retry muted.
       if (e.name === 'NotAllowedError' && !this.video.muted) {
+        this.autoplayMuted = true;
         this.video.muted = true;
         return this.video.play().catch(() => this.setState(PlayerState.PAUSED));
       }
@@ -802,9 +805,11 @@ export class Player {
         this.muted.value = v.muted;
       });
       this.events.emit('onVolumeChange', { volume, muted: v.muted });
+      if (!v.muted) this.autoplayMuted = false;
       if (this.opts.persistPrefs) {
         savePref('volume', volume);
-        savePref('muted', v.muted);
+        // The fallback mute after a blocked autoplay must not become the saved setting.
+        if (!this.autoplayMuted) savePref('muted', v.muted);
       }
     });
     on('ratechange', () => {

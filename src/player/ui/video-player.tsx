@@ -270,7 +270,7 @@ export function VideoPlayer(props: VideoPlayerProps): VNode {
         <BufferingIndicator />
         <ToggleIndicator icon={indicator.icon} nonce={indicator.nonce} />
         {props.children}
-        <div className={['kb-osd', { 'kb-osd--hidden': !osd }]} disableFocus={!osd} aria-hidden={osd ? null : 'true'}>
+        <div className={['kb-osd', { 'kb-osd--hidden': !osd }]} disableFocus={!osd}>
           <div className="kb-osd__top">
             <MetadataSection>{props.metadata}</MetadataSection>
           </div>
